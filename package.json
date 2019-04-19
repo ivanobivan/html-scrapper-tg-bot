@@ -1,0 +1,19 @@
+{
+  "name": "telegram-scrapper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.30.0"
+  },
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.30.4",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.4"
+  }
+}
