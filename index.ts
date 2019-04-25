@@ -46,7 +46,7 @@ const getPostData = async (): Promise<string> => {
                 const firstElementChild = <HTMLLIElement> postList.firstElementChild;
                 const postTime = <HTMLSpanElement> firstElementChild.querySelector(".post__time");
                 const link = <HTMLLinkElement> firstElementChild.querySelector(".post__title_link");
-                resolve(`${postTime} ${link}`);
+                resolve(`${postTime.textContent} ${link}`);
             });
         });
         request.on("error", (e) => {
