@@ -44,7 +44,6 @@ const getPostData = async (): Promise<string> => {
                 let result: Array<string> = [];
                 const timeList = data.match(/<span class="post__time".*span>/gi);
                 const linklist = data.match(/<a href=".*" class="post__title_link".*>/gi);
-                console.log(linklist);
                 if (timeList && timeList.length) {
                     const element = timeList[0];
                     const first = element.match(/\d{2}.*\d{2}/);
@@ -54,7 +53,7 @@ const getPostData = async (): Promise<string> => {
                 }
                 if (linklist && linklist.length) {
                     const element = linklist[0];
-                    const first = element.match(/https:.*\//);
+                    const first = element.match(/https:.*\/"/);
                     if (first && first.length) {
                         result.push(first[0]);
                     }
