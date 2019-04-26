@@ -53,9 +53,10 @@ const getPostData = async (): Promise<string> => {
                 }
                 if (linklist && linklist.length) {
                     const element = linklist[0];
-                    const first = element.match(/https:.*\/"/);
+                    const first = element.match(/https:.*[\/][^\w]\s/);
                     if (first && first.length) {
-                        result.push(first[0]);
+                        const replaced = first[0].replace("\"","");
+                        result.push(replaced);
                     }
                 }
                 resolve(result.join(" "));
