@@ -4,16 +4,15 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node index.ts"
+    "start": "ts-node index.ts",
+    "test": "ts-node test.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jsdom": "^15.0.0",
     "node-telegram-bot-api": "^0.30.0"
   },
   "devDependencies": {
-    "@types/jsdom": "^12.2.3",
     "@types/node-telegram-bot-api": "^0.30.4",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.4"

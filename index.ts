@@ -2,7 +2,6 @@ import TelegramBot from "node-telegram-bot-api";
 import path from "path";
 import fs from "fs";
 import https from "https";
-import jsdom from "jsdom";
 
 
 export interface BotConfig {
@@ -10,6 +9,7 @@ export interface BotConfig {
     proxy?: string;
     strictSSL?: boolean;
     url: string;
+    siteList: Array<{host: string, path: string}>
 }
 
 const filePath = path.join(__dirname, "config.json");
@@ -41,12 +41,25 @@ const getPostData = async (): Promise<string> => {
             });
 
             res.on("end", () => {
-                const dom = new jsdom.JSDOM(data);
-                const postList = <HTMLUListElement> dom.window.document.querySelector(".content-list");
-                const firstElementChild = <HTMLLIElement> postList.firstElementChild;
-                const postTime = <HTMLSpanElement> firstElementChild.querySelector(".post__time");
-                const link = <HTMLLinkElement> firstElementChild.querySelector(".post__title_link");
-                resolve(`${postTime.textContent} ${link}`);
+                let result: Array<string> = [];
+                const timeList = data.match(/<span class="post__time".*span>/gi);
+                const linklist = data.match(/<a href=".*" class="post__title_link".*>/gi);
+                console.log(linklist);
+                if (timeList && timeList.length) {
+                    const element = timeList[0];
+                    const first = element.match(/\d{2}.*\d{2}/);
+                    if (first && first.length) {
+                        result.push(first[0]);
+                    }
+                }
+                if (linklist && linklist.length) {
+                    const element = linklist[0];
+                    const first = element.match(/https:.*\//);
+                    if (first && first.length) {
+                        result.push(first[0]);
+                    }
+                }
+                resolve(result.join(" "));
             });
         });
         request.on("error", (e) => {
