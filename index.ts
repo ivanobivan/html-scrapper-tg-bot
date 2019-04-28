@@ -62,31 +62,31 @@ scrapperBot.onText(/\/post (\d)?/, async (message, match) => {
 });
 
 scrapperBot.onText(/\/post/, async (message) => {
-    const res = await getPostData(1);
-    const date = res[0].date;
-    const currentMonth = date.match(/[а-яё]{2,}/);
-    let color = "red";
-    if (currentMonth) {
-        let index = months.findIndex(e => e.toLowerCase() === currentMonth[0]) + 1;
-        const trueIndex = index < 10 ? `0${index}` : index.toString();
-        const appDate = date
-            .replace(/[а-яё]{2,}/, trueIndex)
-            .replace(/[а-яё]+/, "")
-            .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
-        const time = Date.parse(appDate);
-        if (lastPostTime < time) {
-            lastPostTime = time;
-            color = "green";
+        const res = await getPostData(1);
+        const date = res[0].date;
+        const currentMonth = date.match(/[а-яё]{2,}/);
+        let article = "";
+        if (currentMonth) {
+            let index = months.findIndex(e => e.toLowerCase() === currentMonth[0]) + 1;
+            const trueIndex = index < 10 ? `0${index}` : index.toString();
+            const appDate = date
+                .replace(/[а-яё]{2,}/, trueIndex)
+                .replace(/[а-яё]+/, "")
+                .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
+            const time = Date.parse(appDate);
+            if (lastPostTime < time) {
+                lastPostTime = time;
+                article = "Already read";
+            }
         }
+        scrapperBot.sendMessage(
+            message.chat.id,
+            res.map(e => `<b>${article}</b>Publish date: ${e.date}\nLink: ${e.link}`).join(""),
+            {
+                parse_mode: "HTML"
+            }
+        )
     }
-    scrapperBot.sendMessage(
-        message.chat.id,
-        res.map(e => `<b style="color:${color}">Publish date: ${e.date}</b>\nLink: ${e.link}`).join(""),
-        {
-            parse_mode: "HTML"
-        }
-    );
-}
 );
 
 scrapperBot.onText(/\/ping/, (message) => {
