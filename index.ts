@@ -61,7 +61,7 @@ scrapperBot.onText(/\/post (\d)?/, async (message, match) => {
     );
 });
 
-scrapperBot.onText(/\/post/, async (message) => {
+scrapperBot.onText(/\/last/, async (message) => {
         const res = await getPostData(1);
         const date = res[0].date;
         const currentMonth = date.match(/[а-яё]{2,}/);
@@ -76,12 +76,12 @@ scrapperBot.onText(/\/post/, async (message) => {
             const time = Date.parse(appDate);
             if (lastPostTime < time) {
                 lastPostTime = time;
-                article = "Already read";
+                article = "It's NEW\n";
             }
         }
         scrapperBot.sendMessage(
             message.chat.id,
-            res.map(e => `<b>${article}</b>Publish date: ${e.date}\nLink: ${e.link}`).join(""),
+            res.map(e => `<i>${article}</i>Publish date: ${e.date}\nLink: ${e.link}`).join(""),
             {
                 parse_mode: "HTML"
             }
@@ -93,7 +93,7 @@ scrapperBot.onText(/\/ping/, (message) => {
     scrapperBot.sendMessage(message.chat.id, "available");
 });
 
-scrapperBot.onText(/\/timer/, (message) => {
+/*scrapperBot.onText(/\/timer/, (message) => {
     setTimeout(function thread() {
         scrapperBot.sendMessage(message.chat.id, "Time to check new posts", {
             reply_markup: {
@@ -106,7 +106,7 @@ scrapperBot.onText(/\/timer/, (message) => {
         setTimeout(thread, 10000);
     }, 10000);
 
-});
+});*/
 
 
 const getPostData = async (count: number): Promise<Array<{ date: string; link: string; }>> => {
