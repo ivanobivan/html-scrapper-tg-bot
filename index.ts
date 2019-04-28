@@ -3,6 +3,8 @@ import path from "path";
 import fs from "fs";
 import https from "https";
 
+import {months} from "./var";
+
 
 export interface BotConfig {
     token: string;
@@ -41,9 +43,11 @@ const commands: Array<{ name: string; signature?: string; description: string }>
     }
 ];
 
+let lastPostTime: number = 0;
+
 scrapperBot.onText(/\/help/, (message) => {
     scrapperBot.sendMessage(message.chat.id,
-        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name} ${e.signature}: ${e.description}\n`)}`
+        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name} ${e.signature || ""}: ${e.description}\n`).join("")}`
     );
 });
 
@@ -59,7 +63,25 @@ scrapperBot.onText(/\/post (\d)?/, async (message, match) => {
 
 scrapperBot.onText(/\/post/, async (message) => {
     const res = await getPostData(1);
-    scrapperBot.sendMessage(message.chat.id, res.map(e => `Publish date: ${e.date}\nLink: ${e.link}`).join(""));
+    const date = res[0].date;
+    const currentMonth = date.match(/[а-яё]{2,}/);
+    let color = "red";
+    if (currentMonth) {
+        let index = months.findIndex(e => e.toLowerCase() === currentMonth[0]) + 1;
+        const trueIndex = index < 10 ? `0${index}` : index.toString();
+        const appDate = date
+            .replace(/[а-яё]{2,}/, trueIndex)
+            .replace(/[а-яё]+/, "")
+            .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
+        const time = Date.parse(appDate);
+        if(lastPostTime < time) {
+            lastPostTime = time;
+            color = "green";
+        }
+    }
+    scrapperBot.sendMessage(
+        message.chat.id, res.map(e => `<b style="color:${color}">Publish date: ${e.date}\n</b>Link: ${e.link}`).join("")
+    );
 });
 
 scrapperBot.onText(/\/ping/, (message) => {
