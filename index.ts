@@ -25,20 +25,41 @@ const scrapperBot = new TelegramBot(config.token, {
     }
 });
 
+const commands: Array<{ name: string; description: string }> = [
+    {
+        name: "post",
+        description: ""
+    },
+    {
+        name: "post",
+        description: ""
+    },
+    {
+        name: "post",
+        description: ""
+    }
+];
+
+scrapperBot.onText(/\/help/, (message) => {
+    scrapperBot.sendMessage(message.chat.id,
+        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name}: ${e.description}\n`)}`
+    );
+});
+
 scrapperBot.onText(/\/post (\d)?/, async (message, match) => {
     const count = match ? parseInt(match[1]) : 1;
     const res = await getPostData(count);
-    if (count > 1) {
-        const header = count > 2 ? "days" : "day";
-        const body = res.map(e => `Publish date: ${e.date}\nLink: ${e.link}`).join("\n---------------\n");
-        scrapperBot.sendMessage(message.chat.id,
-            `Posts by ${count} ${header}\n${body}`
-        );
-    } else {
-        scrapperBot.sendMessage(message.chat.id, res.map(e => `Publish date: ${e.date}\nLink: ${e.link}`).join(""));
-    }
+    const header = count > 2 ? "weeks" : "week";
+    const body = res.map(e => `Publish date: ${e.date}\nLink: ${e.link}`).join("\n---------------\n");
+    scrapperBot.sendMessage(message.chat.id,
+        `Post list by last ${count} ${header}\n${body}`
+    );
 });
 
+scrapperBot.onText(/\/post/, async (message) => {
+    const res = await getPostData(1);
+    scrapperBot.sendMessage(message.chat.id, res.map(e => `Publish date: ${e.date}\nLink: ${e.link}`).join(""));
+});
 
 scrapperBot.onText(/\/ping/, (message) => {
     scrapperBot.sendMessage(message.chat.id, "available");
