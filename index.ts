@@ -34,12 +34,16 @@ const commands: Array<{ name: string; signature?: string; description: string }>
         description: ""
     },
     {
-        name: "post",
-        description: ""
+        name: "last",
+        description: "get last post"
     },
     {
-        name: "post",
-        description: ""
+        name: "help",
+        description: "get help"
+    },
+    {
+        name: "ping",
+        description: "simple ping"
     }
 ];
 
@@ -47,7 +51,24 @@ let lastPostTime: number = 0;
 
 scrapperBot.onText(/\/help/, (message) => {
     scrapperBot.sendMessage(message.chat.id,
-        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name} ${e.signature || ""}: ${e.description}\n`).join("")}`
+        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name} ${e.signature || ""} ${e.description}\n`).join("")}`,
+        {
+            reply_markup: {
+                keyboard: [
+                    [
+                        {
+                          text: "/last"
+                        },
+                        {
+                            text: "/ping"
+                        },
+                        {
+                             text: "/help"
+                        }
+                    ]
+                ]
+            }
+        }
     );
 });
 
