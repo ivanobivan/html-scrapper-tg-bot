@@ -80,7 +80,7 @@ scrapperBot.onText(/\/post/, async (message) => {
         }
     }
     scrapperBot.sendMessage(
-        message.chat.id, res.map(e => `<b style="color:${color}">Publish date: ${e.date}\n</b>Link: ${e.link}`).join("")
+        message.chat.id, res.map(e => `<b style="color:${color}">Publish date: ${e.date}</b>\nLink: ${e.link}`).join("")
     );
 });
 
