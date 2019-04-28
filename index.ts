@@ -74,15 +74,20 @@ scrapperBot.onText(/\/post/, async (message) => {
             .replace(/[а-яё]+/, "")
             .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
         const time = Date.parse(appDate);
-        if(lastPostTime < time) {
+        if (lastPostTime < time) {
             lastPostTime = time;
             color = "green";
         }
     }
     scrapperBot.sendMessage(
-        message.chat.id, res.map(e => `<b style="color:${color}">Publish date: ${e.date}</b>\nLink: ${e.link}`).join("")
+        message.chat.id,
+        res.map(e => `<b style="color:${color}">Publish date: ${e.date}</b>\nLink: ${e.link}`).join(""),
+        {
+            parse_mode: "HTML"
+        }
     );
-});
+}
+);
 
 scrapperBot.onText(/\/ping/, (message) => {
     scrapperBot.sendMessage(message.chat.id, "available");
