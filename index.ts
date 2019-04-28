@@ -25,9 +25,10 @@ const scrapperBot = new TelegramBot(config.token, {
     }
 });
 
-const commands: Array<{ name: string; description: string }> = [
+const commands: Array<{ name: string; signature?: string; description: string }> = [
     {
         name: "post",
+        signature: "(number)",
         description: ""
     },
     {
@@ -42,7 +43,7 @@ const commands: Array<{ name: string; description: string }> = [
 
 scrapperBot.onText(/\/help/, (message) => {
     scrapperBot.sendMessage(message.chat.id,
-        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name}: ${e.description}\n`)}`
+        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name} ${e.signature}: ${e.description}\n`)}`
     );
 });
 
