@@ -46,7 +46,14 @@ scrapperBot.onText(/\/ping/, (message) => {
 
 scrapperBot.onText(/\/timer/, (message) => {
     setTimeout(function thread() {
-        scrapperBot.sendMessage(message.chat.id, new Date().toLocaleString("ru"));
+        scrapperBot.sendMessage(message.chat.id, "Time to check new posts", {
+            reply_markup: {
+                keyboard: [
+                    [{text: "/post"}]
+                ]
+
+            }
+        });
         setTimeout(thread, 10000);
     }, 10000);
 
