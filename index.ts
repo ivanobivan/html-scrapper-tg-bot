@@ -103,7 +103,12 @@ scrapperBot.onText(/\/ping/, message => {
 
 });*/
 
-const getSpecificData = async <T>(host: string, path: string, callback: (data: string, ...args: any) => T, ...args: Array<any>): Promise<T> => {
+const getSpecificData = async <T>(
+    host: string,
+    path: string,
+    callback: (data: string, ...args: Array<any>) => T,
+    ...args: Array<any>
+): Promise<T> => {
     return new Promise((resolve, reject) => {
         const request = https.request({host, path}, res => {
             let data = "";
