@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import https from "https";
 
-import {months, commands} from "./var";
+import {months, commands, serviceWords, ServiceWords} from "./var";
 import {HabrData, habrScrapper} from "./api";
 
 export interface BotConfig {
@@ -64,17 +64,32 @@ scrapperBot.onText(/\/post (\d)?/, async (message, match) => {
 scrapperBot.onText(/\/last/, async message => {
     const res = await getSpecificData<HabrData>("habr.com", "/ru/users/alexzfort/posts/", habrScrapper, 1);
     const date = res[0].date;
-    const currentMonth = date.match(/[а-яё]{2,}/);
+    const word = date.match(/[а-яё]{2,}/);
     let article = "";
-    if (currentMonth) {
-        const index = months.findIndex(e => e.toLowerCase() === currentMonth[0]) + 1;
-        const trueIndex = index < 10 ? `0${index}` : index.toString();
-        const appDate = date
-            .replace(/[а-яё]{2,}/, trueIndex)
-            .replace(/[а-яё]+/, "")
-            .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
-        const time = Date.parse(appDate);
-        if (lastPostTime < time) {
+    if (word) {
+        let time;
+        if(months.includes(word[0])) {
+            const index = months.findIndex(e => e.toLowerCase() === word[0]) + 1;
+            const trueIndex = index < 10 ? `0${index}` : index.toString();
+            const appDate = date
+                .replace(/[а-яё]{2,}/, trueIndex)
+                .replace(/[а-яё]+/, "")
+                .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
+            time = Date.parse(appDate);
+        }else if(serviceWords.includes(word[0])) {
+            const index = serviceWords.find(e => e.toLowerCase() === word[0]);
+            if (index === ServiceWords.today) {
+                const tick = date.match(/\d\d:\d\d/);
+                if (tick && tick.length) {
+                    const current = new Date();
+                    const month = current.getMonth() < 10 ? `0${current.getMonth()}` : current.getMonth().toString();
+                    const appDate = (`${current.getFullYear()}-${month}-${current.getDate()}T${tick[0]}-03:00`);
+                    time = Date.parse(appDate);
+                }
+            }
+        }
+
+        if (time && lastPostTime < time) {
             lastPostTime = time;
             article = "It's NEW\n";
         }
