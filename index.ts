@@ -11,7 +11,7 @@ export interface BotConfig {
     proxy?: string;
     strictSSL?: boolean;
     url: string;
-    siteList: Array<{host: string; path: string}>;
+    siteList: Array<{ host: string; path: string }>;
 }
 
 const filePath = path.join(__dirname, "config.json");
@@ -68,7 +68,7 @@ scrapperBot.onText(/\/last/, async message => {
     let article = "";
     if (word) {
         let time;
-        if(months.includes(word[0])) {
+        if (months.includes(word[0])) {
             const index = months.findIndex(e => e.toLowerCase() === word[0]) + 1;
             const trueIndex = index < 10 ? `0${index}` : index.toString();
             const appDate = date
@@ -76,7 +76,7 @@ scrapperBot.onText(/\/last/, async message => {
                 .replace(/[а-яё]+/, "")
                 .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
             time = Date.parse(appDate);
-        }else if(serviceWords.includes(word[0])) {
+        } else if (serviceWords.includes(word[0])) {
             const index = serviceWords.find(e => e.toLowerCase() === word[0]);
             if (index === ServiceWords.today) {
                 const tick = date.match(/\d\d:\d\d/);
