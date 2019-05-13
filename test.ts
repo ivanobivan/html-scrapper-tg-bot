@@ -1,6 +1,5 @@
 import {months, ServiceWords, serviceWords} from "./var";
 
-
 /*const filePath = path.join(__dirname, "test.txt");
 const testFile = fs.readFileSync(filePath, "utf-8");*/
 
@@ -48,10 +47,9 @@ if (word) {
             if (time && time.length) {
                 const current = new Date();
                 const month = current.getMonth() < 10 ? `0${current.getMonth()}` : current.getMonth().toString();
-                const appDate = (`${current.getFullYear()}-${month}-${current.getDate()}T${time[0]}-03:00`);
+                const appDate = `${current.getFullYear()}-${month}-${current.getDate()}T${time[0]}-03:00`;
                 console.log(Date.parse(appDate));
             }
         }
     }
-
 }

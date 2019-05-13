@@ -11,7 +11,7 @@ export interface BotConfig {
     proxy?: string;
     strictSSL?: boolean;
     url: string;
-    siteList: Array<{ host: string; path: string }>;
+    siteList: Array<{host: string; path: string}>;
 }
 
 const filePath = path.join(__dirname, "config.json");
@@ -83,7 +83,7 @@ scrapperBot.onText(/\/last/, async message => {
                 if (tick && tick.length) {
                     const current = new Date();
                     const month = current.getMonth() < 10 ? `0${current.getMonth()}` : current.getMonth().toString();
-                    const appDate = (`${current.getFullYear()}-${month}-${current.getDate()}T${tick[0]}-03:00`);
+                    const appDate = `${current.getFullYear()}-${month}-${current.getDate()}T${tick[0]}-03:00`;
                     time = Date.parse(appDate);
                 }
             }
