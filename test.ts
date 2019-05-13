@@ -1,4 +1,5 @@
 import {months, ServiceWords, serviceWords} from "./var";
+import twitter from "twitter";
 
 /*const filePath = path.join(__dirname, "test.txt");
 const testFile = fs.readFileSync(filePath, "utf-8");*/
@@ -28,6 +29,7 @@ for (let i = 0; i < 1; i++) {
 }
 console.log("За неделю");
 console.log(result.map(e => `Publish date: ${e.date}\nLink: ${e.link}`).join("\n---------------\n"));*/
+/*
 
 const date = "сегодня в 23:05";
 const word = date.match(/[а-яё]{2,}/);
@@ -53,3 +55,7 @@ if (word) {
         }
     }
 }
+*/
+
+
+

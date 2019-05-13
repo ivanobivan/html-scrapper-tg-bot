@@ -5,22 +5,17 @@ export enum ServiceWords {
 }
 
 export const serviceWords = ["сегодня"];
-export const commands: Array<{name: string; signature?: string; description: string}> = [
-    {
-        name: "post",
-        signature: "(number)",
-        description: ""
-    },
-    {
-        name: "last",
-        description: "get last post"
-    },
-    {
-        name: "help",
-        description: "get help"
-    },
-    {
-        name: "ping",
-        description: "simple ping"
-    }
+
+export const commands = [
+    [
+        {
+            text: "/last"
+        },
+        {
+            text: "/ping"
+        },
+        {
+            text: "/post 2"
+        }
+    ]
 ];

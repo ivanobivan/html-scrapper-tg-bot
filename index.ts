@@ -30,27 +30,11 @@ const scrapperBot = new TelegramBot(config.token, {
 let lastPostTime = 0;
 
 scrapperBot.onText(/\/help/, message => {
-    scrapperBot.sendMessage(
-        message.chat.id,
-        `Available command list:\n ${commands.map((e, i) => `${i} - /${e.name} ${e.signature || ""} ${e.description}\n`).join("")}`,
-        {
-            reply_markup: {
-                keyboard: [
-                    [
-                        {
-                            text: "/last"
-                        },
-                        {
-                            text: "/ping"
-                        },
-                        {
-                            text: "/help"
-                        }
-                    ]
-                ]
-            }
+    scrapperBot.sendMessage(message.chat.id, "", {
+        reply_markup: {
+            keyboard: commands
         }
-    );
+    });
 });
 
 scrapperBot.onText(/\/post (\d)?/, async (message, match) => {
@@ -103,20 +87,16 @@ scrapperBot.onText(/\/ping/, message => {
     scrapperBot.sendMessage(message.chat.id, "available");
 });
 
-/*scrapperBot.onText(/\/timer/, (message) => {
+scrapperBot.onText(/\/timer/, message => {
     setTimeout(function thread() {
-        scrapperBot.sendMessage(message.chat.id, "Time to check new posts", {
-            reply_markup: {
-                keyboard: [
-                    [{text: "/post"}]
-                ]
-
-            }
-        });
-        setTimeout(thread, 10000);
-    }, 10000);
-
-});*/
+        const date = new Date();
+        if (date.getHours() === 0) {
+            scrapperBot.sendMessage(message.chat.id, "Time to check new posts");
+        } else {
+            setTimeout(thread, 3600000);
+        }
+    }, 1000);
+});
 
 const getSpecificData = async <T>(
     host: string,
