@@ -15,7 +15,7 @@ export const commands = [
             text: "/ping"
         },
         {
-            text: "/post 2"
+            text: "/post 3"
         }
     ]
 ];

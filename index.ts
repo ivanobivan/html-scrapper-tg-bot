@@ -30,7 +30,7 @@ const scrapperBot = new TelegramBot(config.token, {
 let lastPostTime = 0;
 
 scrapperBot.onText(/\/help/, message => {
-    scrapperBot.sendMessage(message.chat.id, "", {
+    scrapperBot.sendMessage(message.chat.id, "keybord updated", {
         reply_markup: {
             keyboard: commands
         }
