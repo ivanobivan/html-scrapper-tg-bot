@@ -11,7 +11,7 @@ export interface BotConfig {
     proxy?: string;
     strictSSL?: boolean;
     url: string;
-    siteList: Array<{host: string; path: string}>;
+    siteList: Array<{ host: string; path: string }>;
 }
 
 const filePath = path.join(__dirname, "config.json");
@@ -92,9 +92,8 @@ scrapperBot.onText(/\/timer/, message => {
         const date = new Date();
         if (date.getHours() === 0) {
             scrapperBot.sendMessage(message.chat.id, "Time to check new posts");
-        } else {
-            setTimeout(thread, 3600000);
         }
+        setTimeout(thread, 3600000);
     }, 1000);
 });
 
