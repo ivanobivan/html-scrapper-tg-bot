@@ -9,13 +9,22 @@ export const serviceWords = ["сегодня"];
 export const commands = [
     [
         {
-            text: "/last"
+            text: "/ping"
         },
         {
-            text: "/ping"
+            text: "/last"
         },
         {
             text: "/post 3"
         }
     ]
+];
+
+export const resources = [
+    "https://www.reddit.com/",
+    "https://twitter.com/",
+    "https://habr.com/ru/feed/",
+    "https://developer.mozilla.org/ru/",
+    "https://news.ycombinator.com/",
+    "https://radio-t.com/"
 ];

@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import https from "https";
 
-import {months, commands, serviceWords, ServiceWords} from "./var";
+import {months, commands, serviceWords, ServiceWords, resources} from "./var";
 import {HabrData, habrScrapper} from "./api";
 
 export interface BotConfig {
@@ -91,7 +91,7 @@ scrapperBot.onText(/\/timer/, message => {
     setTimeout(function thread() {
         const date = new Date();
         if (date.getHours() === 0) {
-            scrapperBot.sendMessage(message.chat.id, "Time to check new posts");
+            scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n ${resources.join("\n")}`);
         }
         setTimeout(thread, 3600000);
     }, 1000);
