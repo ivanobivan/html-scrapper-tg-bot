@@ -18,6 +18,12 @@ export const commands = [
             text: "/news"
         },
         {
+            text: "/start"
+        },
+        {
+            text: "/stop"
+        },
+        {
             text: "/post 3"
         }
     ]

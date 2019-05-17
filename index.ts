@@ -5,13 +5,14 @@ import https from "https";
 
 import {months, commands, serviceWords, ServiceWords, resources} from "./var";
 import {HabrData, habrScrapper} from "./api";
+import Timer = NodeJS.Timer;
 
 export interface BotConfig {
     token: string;
     proxy?: string;
     strictSSL?: boolean;
     url: string;
-    siteList: Array<{host: string; path: string}>;
+    siteList: Array<{ host: string; path: string }>;
 }
 
 const filePath = path.join(__dirname, "config.json");
@@ -28,6 +29,7 @@ const scrapperBot = new TelegramBot(config.token, {
 });
 
 let lastPostTime = 0;
+let timer: Timer | null = null;
 
 scrapperBot.onText(/\/help/, message => {
     scrapperBot.sendMessage(message.chat.id, "keybord updated", {
@@ -87,14 +89,23 @@ scrapperBot.onText(/\/ping/, message => {
     scrapperBot.sendMessage(message.chat.id, "available");
 });
 
-scrapperBot.onText(/\/timer/, message => {
-    setTimeout(function thread() {
+scrapperBot.onText(/\/start/, message => {
+    scrapperBot.sendMessage(message.chat.id, "timer enabled");
+    timer = setTimeout(function thread() {
         const date = new Date();
         if (date.getHours() === 0) {
             scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n ${resources.join("\n")}`);
         }
         setTimeout(thread, 3600000);
     }, 1000);
+});
+
+scrapperBot.onText(/\/stop/, message => {
+    if (timer) {
+        clearTimeout(timer);
+        scrapperBot.sendMessage(message.chat.id, "Timer disabled");
+    }
+    scrapperBot.sendMessage(message.chat.id, "Timer didn't start");
 });
 
 scrapperBot.onText(/\/news/, message => {
