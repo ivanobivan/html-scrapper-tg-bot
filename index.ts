@@ -98,7 +98,7 @@ scrapperBot.onText(/\/timer/, message => {
 });
 
 scrapperBot.onText(/\/news/, message => {
-    scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n ${resources.join("\n")}`);
+    scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n${resources.join("\n")}`);
 });
 
 const getSpecificData = async <T>(
