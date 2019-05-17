@@ -15,6 +15,9 @@ export const commands = [
             text: "/last"
         },
         {
+            text: "/news"
+        },
+        {
             text: "/post 3"
         }
     ]

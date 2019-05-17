@@ -11,7 +11,7 @@ export interface BotConfig {
     proxy?: string;
     strictSSL?: boolean;
     url: string;
-    siteList: Array<{ host: string; path: string }>;
+    siteList: Array<{host: string; path: string}>;
 }
 
 const filePath = path.join(__dirname, "config.json");
@@ -95,6 +95,10 @@ scrapperBot.onText(/\/timer/, message => {
         }
         setTimeout(thread, 3600000);
     }, 1000);
+});
+
+scrapperBot.onText(/\/news/, message => {
+    scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n ${resources.join("\n")}`);
 });
 
 const getSpecificData = async <T>(
