@@ -104,8 +104,9 @@ scrapperBot.onText(/\/stop/, message => {
     if (timer) {
         clearTimeout(timer);
         scrapperBot.sendMessage(message.chat.id, "Timer disabled");
+    } else {
+        scrapperBot.sendMessage(message.chat.id, "Timer didn't start");
     }
-    scrapperBot.sendMessage(message.chat.id, "Timer didn't start");
 });
 
 scrapperBot.onText(/\/news/, message => {
