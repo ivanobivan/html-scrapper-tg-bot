@@ -10,20 +10,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-telegram-bot-api": "^0.30.0",
-    "twitter": "^1.7.1"
+    "node-telegram-bot-api": "^0.30.0"
   },
   "devDependencies": {
     "@types/node-telegram-bot-api": "^0.30.4",
     "@types/twitter": "^1.7.0",
-    "prettier": "^1.17.0",
-    "ts-node": "^8.1.0",
-    "tslint": "^5.16.0",
+    "prettier": "^1.19.1",
+    "ts-node": "^8.10.2",
+    "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
-    "tslint-plugin-prettier": "^2.0.1",
-    "tslint-react": "^4.0.0",
+    "tslint-plugin-prettier": "^2.3.0",
+    "tslint-react": "^4.1.0",
     "tslint-react-recommended": "^1.0.15",
-    "typescript": "^3.4.4"
+    "typescript": "^3.9.7"
   }
 }
