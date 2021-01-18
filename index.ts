@@ -1,31 +1,13 @@
 import TelegramBot from "node-telegram-bot-api";
-import path from "path";
-import fs from "fs";
 import https from "https";
 
 import {months, commands, serviceWords, ServiceWords, resources} from "./var";
 import {HabrData, habrScrapper} from "./api";
 import Timer = NodeJS.Timer;
 
-export interface BotConfig {
-    token: string;
-    proxy?: string;
-    strictSSL?: boolean;
-    url: string;
-    siteList: Array<{ host: string; path: string }>;
-}
 
-const filePath = path.join(__dirname, "config.json");
-const json = fs.readFileSync(filePath, "utf-8");
-const config: BotConfig = JSON.parse(json);
-
-const scrapperBot = new TelegramBot(config.token, {
-    polling: true,
-    request: {
-        url: config.url,
-        proxy: config.proxy,
-        strictSSL: config.strictSSL
-    }
+const scrapperBot = new TelegramBot(TG_TOKEN, {
+    polling: true
 });
 
 let lastPostTime = 0;
