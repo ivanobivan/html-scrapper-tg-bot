@@ -6,7 +6,7 @@ import {HabrData, habrScrapper} from "./api";
 import Timer = NodeJS.Timer;
 
 //@ts-ignore
-const scrapperBot = new TelegramBot(TG_TOKEN, {
+const scrapperBot = new TelegramBot(process.env.TG_TOKEN, {
     polling: true
 });
 
