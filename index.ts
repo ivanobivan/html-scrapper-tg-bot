@@ -5,7 +5,7 @@ import {months, commands, serviceWords, ServiceWords, resources} from "./var";
 import {HabrData, habrScrapper} from "./api";
 import Timer = NodeJS.Timer;
 
-
+//@ts-ignore
 const scrapperBot = new TelegramBot(TG_TOKEN, {
     polling: true
 });

@@ -4,4 +4,5 @@ node_modules/
 config.json
 index.html
 test.txt
-package-lock.json
+package-lock.json'
+dist
