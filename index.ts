@@ -1,36 +1,83 @@
 import TelegramBot from "node-telegram-bot-api";
-import https from "https";
+import fetch from "node-fetch";
+import schedule, { Job } from "node-schedule";
 
-import {months, commands, serviceWords, ServiceWords, resources} from "./var";
-import {HabrData, habrScrapper} from "./api";
-import Timer = NodeJS.Timer;
-
+import { HabrData, habrScrapper } from "./scrappers";
 //@ts-ignore
-const scrapperBot = new TelegramBot(process.env.TG_TOKEN, {
-    polling: true
-});
+const scrapperBot = new TelegramBot(process.env.TG_TOKEN, { polling: true });
 
 let lastPostTime = 0;
-let timer: Timer | null = null;
+
+enum NAMES {
+    START = "/start",
+    STOP = "/stop",
+    HELP = "/help",
+    PING = "/ping",
+    HABR = "/habr"
+}
+
+const commands = [
+    [
+        {
+            text: NAMES.START
+        },
+        {
+            text: NAMES.STOP
+        },
+        {
+            text: NAMES.HELP
+        },
+        {
+            text: NAMES.PING
+        },
+        {
+            text: NAMES.HABR
+        }
+    ]
+];
+
+const resources = [
+    "https://www.reddit.com/",
+    "https://habr.com/ru/feed/",
+    "https://developer.mozilla.org/ru/",
+    "https://news.ycombinator.com/"
+];
+
+const months = ["января", "февраля", "марта", "апреля", "майя", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+
+const TODAY = "сегодня";
+
+const fetchData = async <T>(url: string, scrapper: (data: string, ...args: Array<any>) => T): Promise<T> => {
+    const data = await fetch(url);
+    const text = await data.text();
+    return scrapper(text);
+};
+
+
+let job: Job;
+
+scrapperBot.onText(/\/start/, message => {
+    job = schedule.scheduleJob('30 7 * * *', () => {
+        scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n${resources.join("\n")}`);
+    });
+});
+
+scrapperBot.onText(/\/stop/, message => {
+    if (job) {
+        job.cancel()
+    }
+});
 
 scrapperBot.onText(/\/help/, message => {
-    scrapperBot.sendMessage(message.chat.id, "keybord updated", {
+    scrapperBot.sendMessage(message.chat.id, Object.values(NAMES).join("\n"), {
         reply_markup: {
             keyboard: commands
         }
     });
 });
 
-scrapperBot.onText(/\/post (\d)?/, async (message, match) => {
-    const count = match ? parseInt(match[1], 10) : 1;
-    const res = await getSpecificData<HabrData>("habr.com", "/ru/users/alexzfort/posts/", habrScrapper, count);
-    const header = count > 2 ? "weeks" : "week";
-    const body = res.map(e => `Publish date: ${e.date}\nLink: ${e.link}`).join("\n---------------\n");
-    scrapperBot.sendMessage(message.chat.id, `Post list by last ${count} ${header}\n${body}`);
-});
-
-scrapperBot.onText(/\/last/, async message => {
-    const res = await getSpecificData<HabrData>("habr.com", "/ru/users/alexzfort/posts/", habrScrapper, 1);
+scrapperBot.onText(/\/habr/, async message => {
+    const res = await fetchData<HabrData>("https://habr.com/ru/users/alexzfort/posts/", habrScrapper);
     const date = res[0].date;
     const word = date.match(/[а-яё]{2,}/);
     let article = "";
@@ -44,16 +91,13 @@ scrapperBot.onText(/\/last/, async message => {
                 .replace(/[а-яё]+/, "")
                 .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
             time = Date.parse(appDate);
-        } else if (serviceWords.includes(word[0])) {
-            const index = serviceWords.find(e => e.toLowerCase() === word[0]);
-            if (index === ServiceWords.today) {
-                const tick = date.match(/\d\d:\d\d/);
-                if (tick && tick.length) {
-                    const current = new Date();
-                    const month = current.getMonth() < 10 ? `0${current.getMonth()}` : current.getMonth().toString();
-                    const appDate = `${current.getFullYear()}-${month}-${current.getDate()}T${tick[0]}-03:00`;
-                    time = Date.parse(appDate);
-                }
+        } else if (TODAY === word[0]) {
+            const tick = date.match(/\d\d:\d\d/);
+            if (tick && tick.length) {
+                const current = new Date();
+                const month = current.getMonth() < 10 ? `0${current.getMonth()}` : current.getMonth().toString();
+                const appDate = `${current.getFullYear()}-${month}-${current.getDate()}T${tick[0]}-03:00`;
+                time = Date.parse(appDate);
             }
         }
 
@@ -68,54 +112,5 @@ scrapperBot.onText(/\/last/, async message => {
 });
 
 scrapperBot.onText(/\/ping/, message => {
-    scrapperBot.sendMessage(message.chat.id, "available");
+    scrapperBot.sendMessage(message.chat.id, "pong");
 });
-
-scrapperBot.onText(/\/start/, message => {
-    scrapperBot.sendMessage(message.chat.id, "timer enabled");
-    timer = setTimeout(function thread() {
-        const date = new Date();
-        if (date.getHours() === 0) {
-            scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n ${resources.join("\n")}`);
-        }
-        setTimeout(thread, 3600000);
-    }, 1000);
-});
-
-scrapperBot.onText(/\/stop/, message => {
-    if (timer) {
-        clearTimeout(timer);
-        scrapperBot.sendMessage(message.chat.id, "Timer disabled");
-    } else {
-        scrapperBot.sendMessage(message.chat.id, "Timer didn't start");
-    }
-});
-
-scrapperBot.onText(/\/news/, message => {
-    scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n${resources.join("\n")}`);
-});
-
-const getSpecificData = async <T>(
-    host: string,
-    path: string,
-    callback: (data: string, ...args: Array<any>) => T,
-    ...args: Array<any>
-): Promise<T> => {
-    return new Promise((resolve, reject) => {
-        const request = https.request({host, path}, res => {
-            let data = "";
-
-            res.on("data", (chunk: string) => {
-                data += chunk;
-            });
-
-            res.on("end", () => {
-                resolve(callback(data, args));
-            });
-        });
-        request.on("error", e => {
-            reject(e);
-        });
-        request.end();
-    });
-};
