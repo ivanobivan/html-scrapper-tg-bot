@@ -2,18 +2,24 @@ import TelegramBot from "node-telegram-bot-api";
 import fetch from "node-fetch";
 import schedule, { Job } from "node-schedule";
 
-import { HabrData, habrScrapper } from "./scrappers";
+import { habrScrapper } from "./habrScrappers";
+import Parser  from 'rss-parser';
+
+const parser = new Parser();
+
+export type ScrapperData = {title: OptionalString, link: OptionalString, date: OptionalString};
+export type OptionalString = string | undefined | null;
+
 //@ts-ignore
 const scrapperBot = new TelegramBot(process.env.TG_TOKEN, { polling: true });
-
-let lastPostTime = 0;
 
 enum NAMES {
     START = "/start",
     STOP = "/stop",
     HELP = "/help",
     PING = "/ping",
-    HABR = "/habr"
+    HABR = "/habr",
+    NEWS = "/news"
 }
 
 const commands = [
@@ -32,33 +38,61 @@ const commands = [
         },
         {
             text: NAMES.HABR
+        },
+        {
+            text: NAMES.NEWS
         }
     ]
 ];
 
-const resources = [
-    "https://www.reddit.com/",
-    "https://habr.com/ru/feed/",
-    "https://developer.mozilla.org/ru/",
-    "https://news.ycombinator.com/"
-];
-
-const months = ["января", "февраля", "марта", "апреля", "майя", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-
-const TODAY = "сегодня";
-
-const fetchData = async <T>(url: string, scrapper: (data: string, ...args: Array<any>) => T): Promise<T> => {
-    const data = await fetch(url);
-    const text = await data.text();
-    return scrapper(text);
+const resources = {
+    HABR_FRONTEND: "https://habr.com/ru/users/alexzfort/posts/",
+    HABR_NEWS: "https://habr.com/ru/news/",
+    MDN_NEWS: "https://hacks.mozilla.org/",
+    3: "https://news.ycombinator.com/"
 };
 
+const fetchData = async <T>(url: string, scrapper: Function, extractCount: number): Promise<T> => {
+    const data = await fetch(url);
+    const text = await data.text();
+    return scrapper(text, extractCount);
+};
+
+const getHabrData = async (link: string, extractCount: number = 1): Promise<string> => {
+    const habrData: ScrapperData[] = await fetchData<ScrapperData[]>(link, habrScrapper, extractCount);
+    return habrData.reduce((line, data) => {
+        line += `${getHabrDataAsString(data)}\n`;
+        return line;
+    }, "");
+}
+
+const getHabrDataAsString = (habrData: ScrapperData) => {
+    return `<b>Publish date: ${habrData.date}</b>\nTitle: ${habrData.title}\nLink: ${habrData.link}\n`
+}
+
+
+const collectNews = async () => {
+    const result: string[] = [];
+    result.push("--------Habr news--------");
+    const habrData = await getHabrData(resources.HABR_FRONTEND);
+    if (habrData) {
+        result.push(habrData);
+    }
+    const habrDataNews = await getHabrData(resources.HABR_NEWS, 10);
+    if (habrDataNews) {
+        result.push(habrDataNews);
+    }
+    result.push("--------MDN news--------");
+    return result;
+}
 
 let job: Job;
 
 scrapperBot.onText(/\/start/, message => {
-    job = schedule.scheduleJob('30 7 * * *', () => {
-        scrapperBot.sendMessage(message.chat.id, `Hi, check what's new on next resources\n${resources.join("\n")}`);
+    scrapperBot.sendMessage(message.chat.id, "bot lauched");
+    job = schedule.scheduleJob('30 7 * * *', async () => {
+        const newsList = await collectNews();
+        scrapperBot.sendMessage(message.chat.id, newsList.join("\n"), { parse_mode: "HTML" });
     });
 });
 
@@ -77,38 +111,21 @@ scrapperBot.onText(/\/help/, message => {
 });
 
 scrapperBot.onText(/\/habr/, async message => {
-    const res = await fetchData<HabrData>("https://habr.com/ru/users/alexzfort/posts/", habrScrapper);
-    const date = res[0].date;
-    const word = date.match(/[а-яё]{2,}/);
-    let article = "";
-    if (word) {
-        let time;
-        if (months.includes(word[0])) {
-            const index = months.findIndex(e => e.toLowerCase() === word[0]) + 1;
-            const trueIndex = index < 10 ? `0${index}` : index.toString();
-            const appDate = date
-                .replace(/[а-яё]{2,}/, trueIndex)
-                .replace(/[а-яё]+/, "")
-                .replace(/(\d{2}) (\d{2}) (\d{4})  (\d{2}):(\d{2})/, "$3-$2-$1T$4:$5-03:00");
-            time = Date.parse(appDate);
-        } else if (TODAY === word[0]) {
-            const tick = date.match(/\d\d:\d\d/);
-            if (tick && tick.length) {
-                const current = new Date();
-                const month = current.getMonth() < 10 ? `0${current.getMonth()}` : current.getMonth().toString();
-                const appDate = `${current.getFullYear()}-${month}-${current.getDate()}T${tick[0]}-03:00`;
-                time = Date.parse(appDate);
-            }
-        }
-
-        if (time && lastPostTime < time) {
-            lastPostTime = time;
-            article = "It's NEW\n";
-        }
+    const result = await getHabrData(resources.HABR_FRONTEND);
+    if (result) {
+        scrapperBot.sendMessage(message.chat.id, result, { parse_mode: "HTML" });
     }
-    scrapperBot.sendMessage(message.chat.id, res.map(e => `<i>${article}</i>Publish date: ${e.date}\nLink: ${e.link}`).join(""), {
-        parse_mode: "HTML"
+});
+
+scrapperBot.onText(/\/news/, async message => {
+    const feed = await parser.parseURL('https://www.reddit.com/.rss');
+    console.log(feed.title);
+  
+    feed.items.forEach(item => {
+      console.log(item.title + ':' + item.link)
     });
+    /* const newsList = await collectNews();
+    scrapperBot.sendMessage(message.chat.id, newsList.join("\n"), { parse_mode: "HTML" }); */
 });
 
 scrapperBot.onText(/\/ping/, message => {
